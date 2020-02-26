@@ -27,7 +27,7 @@
                 </el-form-item>
                 <!-- 按钮 -->
                 <el-form-item class="btns">
-                    <el-button type="primary">登录</el-button>
+                    <el-button type="primary" @click="login">登录</el-button>
                     <el-button type="info" @click="resetLoginFrom">重置</el-button>
                 </el-form-item>
             </el-form>
@@ -41,8 +41,8 @@ export default {
         return {
             //登录表单的数据绑定对象
             loginForm: {
-                username: "zhangsan",
-                password: "123"
+                username: "admin",
+                password: "123456"
             },
             loginRules: {
                 username: [
@@ -79,6 +79,18 @@ export default {
         resetLoginFrom() {
             // console.log(this.$refs.loginFormRef.resetField)
             this.$refs.loginForm.resetFields();
+        },
+        login(){
+            this.$refs.loginForm.validate(async(valid)=>{
+                if(!valid) return;
+                const {data:res} = await this.$http.post('login',this.loginForm)      
+                // console.log(res)
+                if(res.meta.status!=200) return this.$message.error('登陆失败')
+                this.$message.success('登陆成功')
+                console.log(res)
+                window.sessionStorage.setItem('token',res.data.token)
+                this.$router.push('/home')
+            })
         }
     }
 };
