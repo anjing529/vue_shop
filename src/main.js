@@ -4,8 +4,12 @@ import router from './router.js'
 
 // 导入 挂载 配置 axios
 import axios from 'axios'
-Vue.prototype.$http = axios
 axios.defaults.baseURL = 'http://127.0.0.1:8888/api/private/v1/'
+axios.interceptors.request.use(config=>{
+  config.headers.Authorization = window.sessionStorage.getItem('token')
+  return config
+})
+Vue.prototype.$http = axios
 
 import './plugins/element.js'
 // 导入字体图标
