@@ -3,7 +3,7 @@
         <!-- 头部区域 -->
         <el-header>
             <div>
-                <img src="../assets/heima.png" alt />
+                <img src="../assets/logo.png" class="logopng" alt />
                 <span>电商后台管理系统</span>
             </div>
             <el-button type="info" @click="logout">退出</el-button>
@@ -127,5 +127,10 @@ export default {
     color: #fff;
     text-align: center;
     letter-spacing: 0.2em;
+}
+.logopng{
+    width:55px;
+    border-radius: 15px;
+    padding: 5px;
 }
 </style>

@@ -29,7 +29,7 @@
 
             <!-- 用户列表区域 -->
             <el-table :data="userlist" style="width: 100%" border stripe>
-                <el-table-column type="index"></el-table-column>
+                <el-table-column type="index" label="#"></el-table-column>
                 <el-table-column prop="username" label="姓名"></el-table-column>
                 <el-table-column prop="email" label="邮箱"></el-table-column>
                 <el-table-column prop="mobile" label="电话"></el-table-column>
@@ -313,7 +313,7 @@ export default {
 							return this.$message.info('取消删除')
 						}
 						const {data:res} = await this.$http.delete('users/'+id)
-						console.log(res)
+						// console.log(res)
 						if(res.meta.status!==200){
 							return this.$message.error('删除用户失败')
 						}
