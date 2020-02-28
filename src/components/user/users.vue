@@ -67,7 +67,13 @@
 
                         <!-- 分配角色按钮 -->
                         <el-tooltip content="分配角色" placement="top" :enterable="false">
-                            <el-button type="warning" icon="el-icon-setting" circle size="mini"></el-button>
+                            <el-button
+                                type="warning"
+                                icon="el-icon-setting"
+                                circle
+                                size="mini"
+                                @click="setRight(row)"
+                            ></el-button>
                         </el-tooltip>
                     </template>
                 </el-table-column>
@@ -139,6 +145,26 @@
             <el-button @click="editDialogVisible = false">取 消</el-button>
             <el-button type="primary" @click="editUserInfo()">确 定</el-button>
         </el-dialog>
+
+        <!-- 分配角色 -->
+        <el-dialog title="分配角色" :visible.sync="setDialogVisible" width="30%" close="setClose">
+            当前的用户：{{currentuser}}
+            <br />
+            当前的用户角色：{{currentrole}}
+            <el-select placeholder="请选择角色名称" v-model="roleName">
+                <el-option
+                    v-for="item in roleList"
+                    :label="item.roleName"
+                    :key="item.id"
+                    :value="item.id"
+                ></el-option>
+            </el-select>
+
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="setDialogVisible = false">取 消</el-button>
+                <el-button type="primary" @click="up(roleName)">确 定</el-button>
+            </span>
+        </el-dialog>
     </div>
 </template>
 
@@ -208,7 +234,13 @@ export default {
                 ]
             },
             editDialogVisible: false,
-            editForm: {}
+            editForm: {},
+            setDialogVisible: false,
+            roleList: [],
+            roleName: "",
+            currentuser: "",
+            currentrole: "",
+            currentuserid: ""
         };
     },
     created() {
@@ -304,21 +336,62 @@ export default {
         },
         async removeUserById(id) {
             // console.log(id)
-            const confirmRes = await this.$confirm("此操作将永久用户, 是否继续?", "提示", {
-                confirmButtonText: "确定",
-                cancelButtonText: "取消",
-                type: "warning"
-						}).catch(err=> err)
-						if(confirmRes !== 'confirm'){
-							return this.$message.info('取消删除')
-						}
-						const {data:res} = await this.$http.delete('users/'+id)
-						// console.log(res)
-						if(res.meta.status!==200){
-							return this.$message.error('删除用户失败')
-						}
-						this.$message.success('已删除')
-						this.getUserList()
+            const confirmRes = await this.$confirm(
+                "此操作将永久用户, 是否继续?",
+                "提示",
+                {
+                    confirmButtonText: "确定",
+                    cancelButtonText: "取消",
+                    type: "warning"
+                }
+            ).catch(err => err);
+            if (confirmRes !== "confirm") {
+                return this.$message.info("取消删除");
+            }
+            const { data: res } = await this.$http.delete("users/" + id);
+            // console.log(res)
+            if (res.meta.status !== 200) {
+                return this.$message.error("删除用户失败");
+            }
+            this.$message.success("已删除");
+            this.getUserList();
+        },
+        async setRight(user) {
+            // console.log(user)
+            this.currentuser = user.username;
+            this.currentrole = user.role_name;
+            this.currentuserid = user.id;
+
+            this.setDialogVisible = true;
+            const { data: res } = await this.$http.get("roles");
+            // console.log(res)
+            this.roleList = res.data;
+            // console.log(this.roleList)
+        },
+        async up(rolename) {
+            //    console.log(rolename)
+            // console.log(this.currentuserid)
+            if (!this.roleName) {
+               return this.$message.error("请选择角色");
+            }
+            const { data: res } = await this.$http.put(
+                "users/" + this.currentuserid + "/role",
+                { rid: this.roleName }
+            );
+            // console.log(res)
+            if (res.meta.status !== 200) {
+                return this.$message.error("分配角色失败");
+            }
+            this.$message.success("分配角色成功");
+            this.setDialogVisible = false;
+            this.getUserList();
+            
+        },
+        setClose(){
+            this.roleName = ""
+            this.currentuser=""
+            this.currentrole=""
+            this.currentuserid=""
         }
     }
 };

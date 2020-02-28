@@ -3,7 +3,7 @@ html,body,#app{
     height: 100%;
     margin: 0;
     padding: 0;
-    /* width: 1380px; */
+    min-width:900px;
     margin: 0 auto;
 }
 .el-breadcrumb{
