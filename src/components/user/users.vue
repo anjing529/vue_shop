@@ -22,6 +22,7 @@
                         <el-button slot="append" icon="el-icon-search" @click="getUserList"></el-button>
                     </el-input>
                 </el-col>
+                <!-- 添加用户按钮 -->
                 <el-col :span="4">
                     <el-button type="primary" @click="addDialogVisible = true">添加用户</el-button>
                 </el-col>

@@ -1,6 +1,9 @@
 import Vue from 'vue'
 import App from './App.vue'
 import router from './router.js'
+import TreeTable from 'vue-table-with-tree-grid'
+
+Vue.component('tree-table',TreeTable)
 
 // 导入 挂载 配置 axios
 import axios from 'axios'
@@ -10,6 +13,8 @@ axios.interceptors.request.use(config=>{
   return config
 })
 Vue.prototype.$http = axios
+
+
 
 import './plugins/element.js'
 // 导入字体图标
