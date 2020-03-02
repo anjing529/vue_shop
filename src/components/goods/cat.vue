@@ -38,6 +38,12 @@
                     <el-tag type="success" v-else-if="row.cat_level === 1">二级</el-tag>
                     <el-tag type="warning" v-else>三级</el-tag>
                 </template>
+                <!-- 操作 -->
+                <template v-slot:set="{row}">
+                    <!-- {{row}} -->
+                    <el-button type="primary" icon="el-icon-edit" size="mini" @click="edit(row)">编辑</el-button>
+                    <el-button type="danger" icon="el-icon-delete" size="mini" @click="del(row)">删除</el-button>
+                </template>
             </tree-table>
 
             <!-- 分页区域 -->
@@ -74,6 +80,19 @@
                 <el-button type="primary" @click="makeAdd()">确 定</el-button>
             </span>
         </el-dialog>
+
+        <!-- 编辑分类Dialog区域 -->
+        <el-dialog title="修改分类" :visible.sync="editDialogVisible" width="30%" @close="editClose">
+            <el-form :model="editValue" :rules="editCatRules" ref="editRef" label-width="100px">
+                <el-form-item label="修改分类：" prop="name">
+                    <el-input v-model="editValue.name"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="editDialogVisible = false">取 消</el-button>
+                <el-button type="primary" @click="editSend">确 定</el-button>
+            </span>
+        </el-dialog>
     </div>
 </template>
 
@@ -104,6 +123,11 @@ export default {
                     label: "排序",
                     type: "template",
                     template: "order"
+                },
+                {
+                    label: "操作",
+                    type: "template",
+                    template: "set"
                 }
             ],
             newCat: {
@@ -116,7 +140,7 @@ export default {
                 cat_name: [
                     {
                         required: true,
-                        message: "请输入活动名称",
+                        message: "请输入分类名称",
                         trigger: "blur"
                     },
                     {
@@ -136,6 +160,26 @@ export default {
                 value: "cat_id",
                 checkStrictly: true,
                 expandTrigger: "hover"
+            },
+            editDialogVisible: false,
+            editId: 0,
+            editValue: {
+                name: ""
+            },
+            editCatRules: {
+                name: [
+                    {
+                        required: true,
+                        message: "请输入分类名称",
+                        trigger: "blur"
+                    },
+                    {
+                        min: 1,
+                        max: 10,
+                        message: "长度在 1 到 10 个字符",
+                        trigger: "blur"
+                    }
+                ]
             }
         };
     },
@@ -171,16 +215,17 @@ export default {
             this.$refs.addRef.validate(async valid => {
                 // console.log(valid);
                 if (!valid) return;
-                console.log(this.newCat);
+                // console.log(this.newCat);
                 const { data: res } = await this.$http.post(
                     "categories",
                     this.newCat
                 );
-								// console.log(res);
-								if(res.meta.status!==201) return this.$message.error('添加分类失败')
-								this.$message.success('添加分类成功')
-								this.addDialogVisible=false
-								this.getCategories()
+                // console.log(res);
+                if (res.meta.status !== 201)
+                    return this.$message.error("添加分类失败");
+                this.$message.success("添加分类成功");
+                this.addDialogVisible = false;
+                this.getCategories();
             });
         },
         addClose() {
@@ -218,6 +263,47 @@ export default {
                 this.newCat.cat_pid = 0;
                 this.newCat.cat_level = 0;
             }
+        },
+        async edit(row) {
+            // console.log(row.cat_id)
+            (this.editDialogVisible = true), (this.editId = row.cat_id);
+        },
+        editSend() {
+            this.$refs.editRef.validate(async valid => {
+                // console.log(valid);
+                if (!valid) return;
+                const { data: res } = await this.$http.put(
+                    "categories/" + this.editId,
+                    { cat_name: this.editValue.name }
+                );
+                // console.log(res);
+                if (res.meta.status !== 200) {
+                    return this.$message.error("修改分类失败");
+                }
+                this.$message.success("修改分类成功");
+                this.editDialogVisible = false;
+                this.getCategories();
+            });
+        },
+        editClose() {
+            this.$refs.editRef.resetFields();
+        },
+        async del(row) {
+            const confirm = await this.$confirm("此操作将永久删除该分类, 是否继续?", "提示", {
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                type: "warning"
+            }).catch(err => err);
+            // console.log(confirm)
+            if(!confirm) {
+              return this.message.info('取消删除')
+            }
+            const {data:res} = await this.$http.delete('categories/'+row.cat_id)
+            if(res.meta.status!==200){
+              return this.$message.error('删除分类失败')
+            }
+            this.$message.success('删除分类成功')
+            this.getCategories()
         }
     }
 };
