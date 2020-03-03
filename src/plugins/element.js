@@ -2,7 +2,7 @@ import Vue from 'vue'
 import { Button,Form,FormItem,Input,Message,Container,Header,Aside,Main,
         Menu,Submenu,MenuItem,MenuItemGroup,Breadcrumb,BreadcrumbItem,Card,
         Row,Col,Table,TableColumn,Switch,Tooltip,Pagination,Dialog,MessageBox,
-        Tag,Tree,Select,Option,Cascader,Alert,Tabs,TabPane
+        Tag,Tree,Select,Option,Cascader,Alert,Tabs,TabPane,Step,Steps
     } from 'element-ui'
 
 
@@ -40,6 +40,8 @@ Vue.use(Cascader)
 Vue.use(Alert)
 Vue.use(Tabs)
 Vue.use(TabPane)
+Vue.use(Step)
+Vue.use(Steps)
 
 
 Vue.prototype.$message = Message
